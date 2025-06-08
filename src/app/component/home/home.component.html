@@ -1,0 +1,18 @@
+
+    <nav class="bg-blue-600 text-white p-4">
+      <div class="container mx-auto flex justify-between">
+        <a routerLink="/" class="text-xl font-bold">Expense Report App</a>
+        <div>
+          <a routerLink="/register" class="mx-2 hover:underline" *ngIf="!authService.isAuthenticated()">Register</a>
+          <a routerLink="/login" class="mx-2 hover:underline" *ngIf="!authService.isAuthenticated()">Login</a>
+          <a routerLink="/upload" class="mx-2 hover:underline" *ngIf="authService.isAuthenticated()">Upload</a>
+          <a routerLink="/display" class="mx-2 hover:underline" *ngIf="authService.isAuthenticated()">View Data</a>
+          <a routerLink="/feedback" class="mx-2 hover:underline" *ngIf="authService.isAuthenticated()">Feedback</a>
+          <a routerLink="/profile" class="mx-2 hover:underline" *ngIf="authService.isAuthenticated()">Profile</a>
+          <a routerLink="/admin" class="mx-2 hover:underline" *ngIf="authService.isAdmin()">Admin</a>
+          <a routerLink="/debug" class="mx-2 hover:underline" *ngIf="authService.isAuthenticated()">Debug</a>
+          <button (click)="logout()" class="mx-2 hover:underline" *ngIf="authService.isAuthenticated()">Logout</button>
+        </div>
+      </div>
+    </nav>
+    <router-outlet></router-outlet>
