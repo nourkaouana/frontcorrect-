@@ -1,75 +1,97 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
-import { login, User } from '../interfaces/user.interface';
+import { RegistrationRequest, AuthRequest, User } from '../interfaces/user.interface';
 import { AuthResponse } from '../interfaces/auth-response.interface';
-
-
 
 @Injectable({
   providedIn: 'root'
 })
 export class ApiService {
-  // ✅ Le backend attend une version dans l’URL (v1 ici)
-  private baseUrl = 'https://localhost:44328/api/v1';
+  private baseUrl = `${environment.apiUrl}/api`;
 
   constructor(private http: HttpClient) {}
 
-  /** Authentification **/
+  /** Authentication **/
 
-  // ✅ POST /api/v1/auth/register
-  register(user: Partial<User>): Observable<AuthResponse> {
+  // POST /api/auth/register
+  register(user: RegistrationRequest): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.baseUrl}/auth/register`, user);
   }
 
-  // ✅ POST /api/v1/auth/authenticate
-  authenticate(credentials: login): Observable<AuthResponse> {
+  // POST /api/auth/authenticate
+  authenticate(credentials: AuthRequest): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.baseUrl}/auth/authenticate`, credentials);
   }
 
-  /** Analyse de documents **/
+  /** Document Analysis **/
 
-  // ✅ POST /api/v1/document/raw-analyze
+  // POST /api/document/RawaAnalyze
   rawAnalyze(file: File): Observable<any> {
     const formData = new FormData();
     formData.append('file', file);
-    return this.http.post(`${this.baseUrl}/document/rawaanalyze`, formData);
+    return this.http.post(`${this.baseUrl}/document/RawaAnalyze`, formData);
   }
 
-  // ✅ POST /api/v1/document/analyze
+  // POST /api/document/analyze
   uploadAndAnalyze(file: File): Observable<any> {
     const formData = new FormData();
     formData.append('file', file);
     return this.http.post(`${this.baseUrl}/document/analyze`, formData);
   }
 
-  // ✅ POST /api/v1/document/analyze/filtered
+  // POST /api/document/analyze/filtered
   getFilteredData(file: File): Observable<any> {
     const formData = new FormData();
     formData.append('file', file);
     return this.http.post(`${this.baseUrl}/document/analyze/filtered`, formData);
   }
 
-  /** Gestion utilisateurs (si exposée côté backend) **/
+  /** User Management **/
 
-  getAllUsers(): Observable<any> {
-    return this.http.get(`${this.baseUrl}/users`);
+  // GET /api/users/all
+  getAllUsers(): Observable<User[]> {
+    return this.http.get<User[]>(`${this.baseUrl}/users/all`);
   }
 
-  lockUser(id: number): Observable<any> {
-    return this.http.put(`${this.baseUrl}/users/${id}/lock`, {});
+  // GET /api/users/{id}
+  getUserById(id: number): Observable<User> {
+    return this.http.get<User>(`${this.baseUrl}/users/${id}`);
   }
 
-  unlockUser(id: number): Observable<any> {
-    return this.http.put(`${this.baseUrl}/users/${id}/unlock`, {});
+  // GET /api/users/email/{email}
+  getUserByEmail(email: string): Observable<User> {
+    return this.http.get<User>(`${this.baseUrl}/users/email/${email}`);
   }
 
+  // GET /api/users/username/{username}
+  getUserByUsername(username: string): Observable<User> {
+    return this.http.get<User>(`${this.baseUrl}/users/username/${username}`);
+  }
+
+  // PUT /api/users/update-password
+  updatePassword(data: { email: string; newpassword: string; username: string }): Observable<any> {
+    return this.http.put(`${this.baseUrl}/users/update-password`, data);
+  }
+
+  // DELETE /api/users/{id}
   deleteUser(id: number): Observable<any> {
     return this.http.delete(`${this.baseUrl}/users/${id}`);
   }
 
-  /** Feedback (optionnel, à adapter si exposé) **/
+  // POST /api/users/lock/{id}
+  lockUser(id: number): Observable<any> {
+    return this.http.post(`${this.baseUrl}/users/lock/${id}`, {});
+  }
+
+  // POST /api/users/unlock/{id}
+  unlockUser(id: number): Observable<any> {
+    return this.http.post(`${this.baseUrl}/users/unlock/${id}`, {});
+  }
+
+  /** Feedback **/
   submitFeedback(feedback: any): Observable<any> {
     return this.http.post(`${this.baseUrl}/feedback`, feedback);
   }

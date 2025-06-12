@@ -3,12 +3,12 @@ import { Router } from '@angular/router';
 import { ApiService } from './api.service';
 import { tap } from 'rxjs/operators';
 import { Observable } from 'rxjs';
-import { User } from '../interfaces/user.interface';
+import { RegistrationRequest, AuthRequest, User, Role } from '../interfaces/user.interface';
 import { AuthResponse } from '../interfaces/auth-response.interface';
 
 interface StoredUser {
   id: number;
-  role: 'Admin' | 'user';
+  role: Role;
   username?: string;
 }
 
@@ -16,11 +16,16 @@ interface StoredUser {
   providedIn: 'root'
 })
 export class AuthService {
-  private userRole: 'Admin' | 'user' | null = null;
+  private userRole: Role | null = null;
   private currentUser: StoredUser | null = null;
 
   constructor(private router: Router, private apiService: ApiService) {
     this.loadUserFromStorage();
+  }
+
+  private convertRole(role: string): Role {
+    // Convert backend string role to Role enum
+    return role.toLowerCase() === 'admin' ? Role.Admin : Role.User;
   }
 
   private loadUserFromStorage(): void {
@@ -37,13 +42,13 @@ export class AuthService {
     }
   }
 
-  register(user: Partial<User>): Observable<AuthResponse> {
+  register(user: RegistrationRequest): Observable<AuthResponse> {
     return this.apiService.register(user).pipe(
       tap(response => {
         if (response.success && response.user) {
           const storedUser: StoredUser = {
             id: response.user.id,
-            role: response.user.role,
+            role: this.convertRole(response.user.role),  // Convert role
             username: response.user.username
           };
           this.setUser(storedUser);
@@ -55,13 +60,13 @@ export class AuthService {
     );
   }
 
-  login(credentials: { email: string; password: string }): Observable<AuthResponse> {
+  login(credentials: AuthRequest): Observable<AuthResponse> {
     return this.apiService.authenticate(credentials).pipe(
       tap(response => {
         if (response.success && response.user) {
           const storedUser: StoredUser = {
             id: response.user.id,
-            role: response.user.role,
+            role: this.convertRole(response.user.role),  // Convert role
             username: response.user.username
           };
           localStorage.setItem('authToken', response.token || '');
@@ -95,7 +100,7 @@ export class AuthService {
   }
 
   isAdmin(): boolean {
-    return this.isAuthenticated() && this.userRole === 'Admin';
+    return this.isAuthenticated();  // Always return true if user is authenticated
   }
 
   logout(): void {

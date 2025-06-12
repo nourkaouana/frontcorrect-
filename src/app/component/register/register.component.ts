@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { Router } from '@angular/router';
 import { ApiService } from '../../services/api.service';
-import { User } from '../../interfaces/user.interface';
+import { RegistrationRequest, Role } from '../../interfaces/user.interface';
 
 @Component({
   selector: 'app-register',
@@ -21,12 +21,16 @@ export class RegisterComponent {
     lastname: '',
     password: '',
     confirmPassword: '',
-    role: 'user' as 'Admin' | 'user'
+    role: Role.User
   };
   message: string = '';
   isLoading: boolean = false;
   passwordStrength: number = 0;
-  availableRoles = ['Admin', 'user'];
+  availableRoles = [
+    { value: Role.Admin, label: 'Admin' },
+    { value: Role.User, label: 'User' }
+  ];
+  Role = Role;
   formErrors = {
     email: '',
     username: '',
@@ -86,8 +90,8 @@ export class RegisterComponent {
           this.formErrors.password = 'Password is required';
           return false;
         }
-        if (this.user.password.length < 8) {
-          this.formErrors.password = 'Password must be at least 8 characters long';
+        if (this.user.password.length < 6) {
+          this.formErrors.password = 'Password must be at least 6 characters long';
           return false;
         }
         this.formErrors.password = '';
@@ -140,22 +144,22 @@ export class RegisterComponent {
     }
 
     this.isLoading = true;
-    const userData: Partial<User> = {
+    const registrationData: RegistrationRequest = {
       email: this.user.email,
       username: this.user.username,
+      password: this.user.password,
       firstname: this.user.firstname,
       lastname: this.user.lastname,
-      password: this.user.password,
       role: this.user.role
     };
 
-    this.apiService.register(userData).subscribe({
+    this.apiService.register(registrationData).subscribe({
       next: (response) => {
-        this.message = 'Registration successful!';
+        this.message = response.message || 'Registration successful!';
         setTimeout(() => this.router.navigate(['/login']), 2000);
       },
       error: (error) => {
-        this.message = 'Registration failed: ' + error.message;
+        this.message = 'Registration failed: ' + (error.error?.message || error.message);
       },
       complete: () => {
         this.isLoading = false;

@@ -1,7 +1,7 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { User } from '../../interfaces/user.interface';
+import { User, Role } from '../../interfaces/user.interface';
 import { ApiService } from '../../services/api.service';
 
 interface UserStats {
@@ -38,10 +38,9 @@ export class ProfileComponent implements OnInit {
       email: 'user1@example.com',
       firstname: 'John',
       lastname: 'Doe',
-      password: '',
-      role: 'user',
+      role: Role.User,
       isLocked: false,
-      avatarUrl: undefined  // Changé de null à undefined
+      avatarUrl: undefined
     };
     this.errorMessage = '';
     this.loadUserStats();

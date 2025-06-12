@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthResponse } from '../../interfaces/auth-response.interface';
-import { login } from '../../interfaces/user.interface';
+import { AuthRequest } from '../../interfaces/user.interface';
 import { ApiService } from '../../services/api.service';
 import { AuthService } from '../../services/auth.service';
 import { CommonModule } from '@angular/common';
@@ -16,7 +16,7 @@ import { RouterModule } from '@angular/router';
   styleUrls: ['./login.component.css']
 })
 export class LoginComponent {
-  credentials: login = {
+  credentials: AuthRequest = {
     email: '',
     password: ''
   };
@@ -25,14 +25,9 @@ export class LoginComponent {
   constructor(private apiService: ApiService, private authService: AuthService, private router: Router) {}
 
   onLogin(): void {
-    this.apiService.authenticate(this.credentials).subscribe({
+    this.authService.login(this.credentials).subscribe({
       next: (response: AuthResponse) => {
         if (response.token) {
-          localStorage.setItem('authToken', response.token);
-          if (response.user) {
-            localStorage.setItem('userId', response.user.id.toString());
-            this.authService.setUser({ id: response.user.id, role: response.user.role });
-          }
           this.message = 'Login successful!';
           setTimeout(() => this.router.navigate(['/home']), 2000);
         } else {

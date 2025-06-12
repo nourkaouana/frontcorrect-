@@ -4,8 +4,11 @@ export interface AuthResponse {
   token?: string;
   user?: {
     id: number;
-    username?: string;
-    email?: string;
+    email: string;
+    username: string;
+    firstname?: string;
+    lastname?: string;
     role: 'Admin' | 'user';
+    isLocked: boolean;
   };
 }

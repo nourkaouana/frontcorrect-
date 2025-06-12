@@ -9,7 +9,7 @@
           <a routerLink="/display" class="mx-2 hover:underline" *ngIf="authService.isAuthenticated()">View Data</a>
           <a routerLink="/feedback" class="mx-2 hover:underline" *ngIf="authService.isAuthenticated()">Feedback</a>
           <a routerLink="/profile" class="mx-2 hover:underline" *ngIf="authService.isAuthenticated()">Profile</a>
-          <a routerLink="/admin" class="mx-2 hover:underline" *ngIf="authService.isAdmin()">Admin</a>
+          <a routerLink="/admin" class="mx-2 hover:underline" *ngIf="authService.isAuthenticated()">Admin</a>
           <a routerLink="/debug" class="mx-2 hover:underline" *ngIf="authService.isAuthenticated()">Debug</a>
           <button (click)="logout()" class="mx-2 hover:underline" *ngIf="authService.isAuthenticated()">Logout</button>
         </div>
